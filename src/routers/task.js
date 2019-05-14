@@ -88,6 +88,11 @@ router.patch('/tasks/:id', auth, async (req, res) => {
 })
 
 router.delete('/tasks/:id', auth, async (req, res) => {
+    const task = await Task.findById({ _id: req.params.id})
+    if(task.owner !== req.user._id) {
+        return res.status(404).send()
+    }
+
     try {
         const task = await Task.findByIdAndDelete({ _id: req.params.id, owner: req.user._id})
 
@@ -95,7 +100,7 @@ router.delete('/tasks/:id', auth, async (req, res) => {
             return res.status(404).send()
         }
 
-        res.send(task)
+        res.status(200).send(task)
     } catch (e) {
         res.status(500).send()
     }
